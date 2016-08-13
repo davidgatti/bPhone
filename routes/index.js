@@ -9,7 +9,7 @@ router.get('/', function(req, res, next) {
 	client.sendMessage({
 
 	    to:'+48606650353', // Any number Twilio can deliver to
-	    from: '+15005550006', // +16692310573 A number you bought from Twilio and can use for outbound communication
+	    from: '+16692310573', // +16692310573 A number you bought from Twilio and can use for outbound communication
 	    body: 'This is a test' // body of the SMS message
 
 	}, function(err, responseData) { //this function is executed when a response is received from Twilio
