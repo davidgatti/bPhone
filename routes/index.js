@@ -26,6 +26,12 @@ router.get('/', function(req, res, next) {
 	    }
 	});
 
+	client.IncomingPhoneNumbers.get(function(err, response) {
+
+	        console.log(response;
+
+	});
+
 	client.messages.get(function(err, response) {
 	    response.messages.forEach(function(messages) {
 	        console.log('Received from: ' + messages.from);
