@@ -26,9 +26,9 @@ router.get('/', function(req, res, next) {
 	    }
 	});
 
-	client.IncomingPhoneNumbers.get(function(err, response) {
+	client.IncomingPhoneNumbers(function(err, response) {
 
-	        console.log(response);
+	        console.log("Numbers: ", response);
 
 	});
 
