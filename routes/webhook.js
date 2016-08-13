@@ -10,7 +10,9 @@ router.post('/', function(req, res, next) {
 
     client.messages(req.body.SmsMessageSid).get(function(err, response) {
 
-            console.log(response);
+            console.log(response.to);
+            console.log(response.from);
+            console.log(response.body);
 
     });
 
