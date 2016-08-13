@@ -6,6 +6,7 @@ var twilio = require('twilio');
 router.post('/', function(req, res, next) {
 
     console.log(req.body);
+    res.end();
 
 });
 
