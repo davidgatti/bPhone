@@ -1,9 +1,12 @@
 var express = require('express');
 var router = express.Router();
+var twilio = require('twilio');
 
-/* GET users listing. */
+/* GET home page. */
 router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
+
+    console.log(req.body);
+
 });
 
 module.exports = router;
