@@ -1,0 +1,16 @@
+{
+	"name": "bPhone",
+	"description": "A private virtual phone for various account confirmation.",
+	"repository": "https://github.com/davidgatti/bPhone",
+	"logo": "https://raw.githubusercontent.com/davidgatti/bPhone/master/logo.png",
+	"keywords": ["node", "twilio", "wbeRT"],
+	"success_url": "/welcome",
+	"env": {
+		"ACCOUNT_SID": {
+			"description": "Find it in the dashboard https://www.twilio.com/console"
+		},
+		"AUTH_TOKEN": {
+			"description": "Find it in the dashboard https://www.twilio.com/console"
+		}
+	}
+}
