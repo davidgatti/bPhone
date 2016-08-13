@@ -26,10 +26,10 @@ router.get('/', function(req, res, next) {
 	    }
 	});
 
-	client.incomingPhoneNumbers.get(function(err, response) {
-
-	        console.log("Numbers: ", response);
-
+	client.incomingPhoneNumbers.list(function(err, data) {
+    	data.incomingPhoneNumbers.forEach(function(number) {
+        	console.log(number.phoneNumber);
+    	});
 	});
 
 	client.messages.get(function(err, response) {
