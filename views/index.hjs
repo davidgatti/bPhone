@@ -1,58 +1,110 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>{{title}}</title>
-    <script type="text/javascript" src="//media.twiliocdn.com/sdk/js/client/v1.3/twilio.min.js"></script>
-    <script type="text/javascript" src="https://code.jquery.com/jquery-3.1.0.min.jss"></script>
-</head>
-<body>
+	<head>
 
-<button class="call" onclick="call();">
-    Call
-</button>
+		<title>{{title}}</title>
 
-<!-- use an onclick action to hang up the call when the user presses
-the button -->
-<button class="hangup" onclick="hangup();">
-    Hangup
-</button>
+		<script type="text/javascript" src="javascripts/jquery-3.1.0.min.js"></script>
+		<script type="text/javascript" src="javascripts/socket.io-1.4.5.js"></script>
 
-<script type="text/javascript">
+	</head>
 
-    Twilio.Device.setup("{{token}}", {debug: true});
+	<body>
 
-    Twilio.Device.ready(function (device) {
-        $("#log").text("Ready");
-    });
+		<p>Numbers:</p>
 
-    Twilio.Device.error(function (error) {
-        $("#log").text("Error: " + error.message);
-    });
+		<ul id="numbers">
+			<li id="buy">Buy new number</li>
+		</ul>
 
-    Twilio.Device.connect(function (conn) {
-        $("#log").text("Successfully established call");
-    });
+		<p>Messages:</p>
 
-    Twilio.Device.disconnect(function (conn) {
-        $("#log").text("Call ended");
-    });
+		<ul id="messages"></ul>
 
-    /* Listen for incoming connections */
-    Twilio.Device.incoming(function (conn) {
-        $("#log").text("Incoming connection from " + conn.parameters.From);
-        // accept the incoming connection and start two-way audio
-        conn.accept();
-    });
+		<input id="m" autocomplete="off" />
 
-    function call() {
-        Twilio.Device.connect();
-    }
+		<button id="button" value="">Send</button>
 
-    function hangup() {
-        Twilio.Device.disconnectAll();
-    }
-</script>
+	</body>
 
-<div id="log">Loading pigeons...</div>
-</body>
 </html>
+
+<script>
+
+	//
+	//	Create a Socket.IO object
+	//
+	var socket = io();
+
+	//
+	//	Render account numbers
+	//
+	socket.on('number', function(msg) {
+
+		$('#numbers').append($('<li>').text(msg).append($('<ul>')))
+
+	});
+
+	//
+	//	Render
+	//
+	socket.on('fromNumber', function(msg) {
+
+		$("ul li:contains('" + msg.to + "') > ul").append($('<li class="number">').text(msg.from))
+
+	});
+
+	//
+	//	Receive a message
+	//
+	socket.on('message', function(msg) {
+
+		$('#messages').append($('<li>').text(msg));
+
+	});
+
+	socket.on('bought', function(msg) {
+
+		$('#numbers').append($('<li class="number">').text(msg));
+
+	});
+
+
+	//
+	//	Send a message
+	//
+	$('#button').click(function() {
+
+		var number = $('#button').attr("value");
+		var message = $('#m').val();
+
+		var obj = {
+			number: number,
+			message: message
+		};
+
+		socket.emit('sendMessage', obj);
+
+		$('#m').val('');
+
+	});
+
+	$('#numbers').on("click", '.number', function() {
+
+		var number = $(this).text();
+
+		$('#button').val(number);
+		$('#messages').empty();
+
+
+		socket.emit('messages', number);
+
+	});
+
+	$('#numbers').on("click", '#buy', function() {
+
+		socket.emit('buy');
+
+	});
+
+</script>

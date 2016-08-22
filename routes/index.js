@@ -1,47 +1,173 @@
+'use strict';
+
 var express = require('express');
 var router = express.Router();
 var client = require('twilio')(process.env.ACCOUNT_SID, process.env.AUTH_TOKEN);
 
-/* GET home page. */
 router.get('/', function(req, res, next) {
 
-	//Send an SMS text message
-	client.sendMessage({
+	//
+	//	Attach the Web Socket to the NodeJS server
+	//
+	let io = require('socket.io').listen(req.socket.server);
 
-	    to:'+16692310573', // Any number Twilio can deliver to
-	    from: '+16692310573', // +16692310573 A number you bought from Twilio and can use for outbound communication
-	    body: 'This is a test' // body of the SMS message
+	//
+	//	Listen for connections
+	//
+	io.on('connection', function(socket) {
 
-	}, function(err, responseData) { //this function is executed when a response is received from Twilio
+		//
+		//	Settings
+		//
+		socket.setMaxListeners(20);
 
-	    if (!err) { // "err" is an error received during the request, if any
+		//
+		//	List all the numbers
+		//
+		client.incomingPhoneNumbers.list(function(err, data) {
 
-	        // "responseData" is a JavaScript object containing data received from Twilio.
-	        // A sample response from sending an SMS message is here (click "JSON" to see how the data appears in JavaScript):
-	        // http://www.twilio.com/docs/api/rest/sending-sms#example-1
+			data.incomingPhoneNumbers.forEach(function(number) {
 
-	        console.log(responseData.from); // outputs "+14506667788"
-	        console.log(responseData.body); // outputs "word to your mother."
+				client.messages.get({To: number.phoneNumber}, function(err, response) {
 
-	    }
+					response.messages.reduce(function(array, element) {
+
+						//
+						//	Add at least one element
+						//
+						if(array.length == 0)
+						{
+							array.push(element.from);
+						}
+
+						//
+						//	Value used to store if a unique number is being found
+						//
+						let count = 0;
+
+						//
+						//	Look for unique numbers
+						//
+						for(let key in array)
+						{
+							//
+							//	If number different then increment, if the same
+							//	decrement
+							//
+							if(array[key] != element.from)
+							{
+								count++;
+							}
+							else
+							{
+								count--;
+							}
+						}
+
+						//
+						//	If the reminder is one, we know we have to add the
+						//	number to the array
+						//
+						if(count == 1)
+						{
+							array.push(element.from);
+						}
+
+						//
+						//	Return the array fro the next loop
+						//
+						return array;
+
+					}, [])
+					.forEach(function(ble) {
+
+						let obj = {
+							from: ble,
+							to: number.phoneNumber
+						}
+
+						io.emit('fromNumber', obj);
+
+					});
+
+				});
+
+				io.emit('number', number.phoneNumber);
+
+			});
+
+		});
+
+		//
+		//	Do something in disconnect.
+		//
+		socket.on('disconnect', function(){
+
+			console.log('user disconnected');
+
+		});
+
+		//
+		// List all the messages for a given number
+		//
+		socket.on('messages', function(msg) {
+
+			//
+			//	List all the messages for a given number
+			//
+			client.messages.get({From: msg}, function(err, response) {
+
+			    response.messages.forEach(function(messages) {
+
+			        io.emit('message', messages.body);
+
+			    });
+
+			});
+
+		});
+
+		//
+		//	Send a message for a given number
+		//
+		socket.on('sendMessage', function(msg) {
+
+			console.log(msg.number);
+			console.log(msg.message);
+
+			client.sendMessage({
+
+			    to: msg.number,
+			    from: '+16692310573',
+			    body: msg.message
+
+			}, function(err, data) {
+
+			    if (!err) {
+
+			    	io.emit('message', data.body);
+
+			    }
+			});
+
+		});
+
+		//
+		//	Buy new numbers
+		//
+		socket.on('buy', function(){
+
+			io.emit('bought', "+31231231232");
+
+		});
+
 	});
 
-	client.incomingPhoneNumbers.list(function(err, data) {
-    	data.incomingPhoneNumbers.forEach(function(number) {
-        	console.log(number.phoneNumber);
-    	});
-	});
-
-	client.messages.get(function(err, response) {
-	    response.messages.forEach(function(messages) {
-	        console.log('Received from: ' + messages.from);
-	        console.log('Body: ' + messages.body);
-	    });
-	});
-
+	//
+	//	Render the page
+	//
 	res.render('index', {
-		title: 'Express',
-		token: capability.generate()
+		title: 'Express'
 	});
 
 });
