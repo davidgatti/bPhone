@@ -23,6 +23,9 @@
 
 		<input id="m" autocomplete="off" />
 
+		<input id="to" autocomplete="off" />
+		<input id="from" autocomplete="off" />
+
 		<button id="button" value="">Send</button>
 
 	</body>
@@ -75,11 +78,13 @@
 	//
 	$('#button').click(function() {
 
-		var number = $('#button').attr("value");
+		var to = $('#to').val();
+		var from = $('#from').val();
 		var message = $('#m').val();
 
 		var obj = {
-			number: number,
+			to: to,
+			from: from,
 			message: message
 		};
 
@@ -91,13 +96,26 @@
 
 	$('#numbers').on("click", '.number', function() {
 
-		var number = $(this).text();
+		var to = $(this).text();
+		var from = $(this).parent()
+						  .parent()
+						  .clone()    //clone the element
+						  .children() //select all the children
+						  .remove()   //remove all the children
+						  .end()  //again go back to selected element
+						  .text()
 
-		$('#button').val(number);
+
+		$('#to').val(to);
+		$('#from').val(from);
 		$('#messages').empty();
 
+		var obj = {
+			to: to,
+			from: from
+		}
 
-		socket.emit('messages', number);
+		socket.emit('messages', obj);
 
 	});
 

@@ -115,7 +115,7 @@ router.get('/', function(req, res, next) {
 			//
 			//	List all the messages for a given number
 			//
-			client.messages.get({From: msg}, function(err, response) {
+			client.messages.get({From: msg.to}, function(err, response) {
 
 			    response.messages.forEach(function(messages) {
 
@@ -132,13 +132,10 @@ router.get('/', function(req, res, next) {
 		//
 		socket.on('sendMessage', function(msg) {
 
-			console.log(msg.number);
-			console.log(msg.message);
-
 			client.sendMessage({
 
-			    to: msg.number,
-			    from: '+16692310573',
+			    to: msg.to,
+			    from: msg.from,
 			    body: msg.message
 
 			}, function(err, data) {
