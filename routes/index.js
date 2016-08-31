@@ -115,7 +115,17 @@ router.get('/', function(req, res, next) {
 			//
 			//	List all the messages for a given number
 			//
-			client.messages.get({From: msg.to}, function(err, response) {
+			client.messages.get({From: msg.to, To: msg.from}, function(err, response) {
+
+			    response.messages.forEach(function(messages) {
+
+			        io.emit('message', messages.body);
+
+			    });
+
+			});
+
+			client.messages.get({From: msg.from, To: msg.to}, function(err, response) {
 
 			    response.messages.forEach(function(messages) {
 
