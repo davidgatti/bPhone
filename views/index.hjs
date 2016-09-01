@@ -57,13 +57,40 @@
 
 	});
 
+	var db = [];
+
 	//
 	//	Receive a message
 	//
 	socket.on('message', function(msg) {
 
-		$('#messages').append($('<li>').text(msg));
+		$('#messages').append($('<li>').text(msg.date + ": " + msg.body));
+		
+		db.push(msg)
 
+		db.sort(function (a, b) {
+
+			if (a.date > b.date) 
+			{
+			return 1;
+			}
+
+			if (a.date < b.date) 
+			{
+			return -1;
+			}
+
+			// a must be equal to b
+			return 0;
+
+		});
+		
+		$('#messages > li').each(function(index) {
+
+			$(this).text(db[index].date+ ": " +db[index].body);
+
+		});
+		
 	});
 
 	socket.on('bought', function(msg) {
@@ -95,6 +122,8 @@
 	});
 
 	$('#numbers').on("click", '.number', function() {
+
+		db = [];
 
 		var to = $(this).text();
 		var from = $(this).parent()

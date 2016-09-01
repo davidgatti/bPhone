@@ -112,6 +112,19 @@ router.get('/', function(req, res, next) {
 		//
 		socket.on('messages', function(msg) {
 
+			client.messages.get({From: msg.from, To: msg.to}, function(err, response) {
+
+			    response.messages.forEach(function(messages) {
+
+					io.emit('message', {
+						date: messages.dateCreated,
+						body: messages.body
+					});
+
+			    });
+
+			});
+
 			//
 			//	List all the messages for a given number
 			//
@@ -119,17 +132,10 @@ router.get('/', function(req, res, next) {
 
 			    response.messages.forEach(function(messages) {
 
-			        io.emit('message', messages.body);
-
-			    });
-
-			});
-
-			client.messages.get({From: msg.from, To: msg.to}, function(err, response) {
-
-			    response.messages.forEach(function(messages) {
-
-			        io.emit('message', messages.body);
+					io.emit('message', {
+						date: messages.dateCreated,
+						body: messages.body
+					});
 
 			    });
 
