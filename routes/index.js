@@ -7,6 +7,25 @@ var client = require('twilio')(process.env.ACCOUNT_SID, process.env.AUTH_TOKEN);
 router.get('/', function(req, res, next) {
 
 	//
+	//	Check if the account is active or not
+	//
+	client.accounts(process.env.ACCOUNT_SID).get(function(err, account) {
+		
+		if(err)
+		{
+			io.emit('alert', err.message);
+		}
+		else
+		{
+			if(account.status != 'active')
+			{
+				io.emit('alert', account.status);
+			}
+		}
+	
+	});
+
+	//
 	//	Attach the Web Socket to the NodeJS server
 	//
 	let io = require('socket.io').listen(req.socket.server);
@@ -26,6 +45,11 @@ router.get('/', function(req, res, next) {
 		//
 		client.incomingPhoneNumbers.list(function(err, data) {
 
+			if(err)
+			{
+				return 1;
+			}
+
 			data.incomingPhoneNumbers.forEach(function(number) {
 
 				client.messages.get({To: number.phoneNumber}, function(err, response) {
@@ -41,7 +65,8 @@ router.get('/', function(req, res, next) {
 						}
 
 						//
-						//	Value used to store if a unique number is being found
+						//	Value used to store if a unique number is being 
+						//	found
 						//
 						let count = 0;
 
@@ -92,7 +117,12 @@ router.get('/', function(req, res, next) {
 
 				});
 
-				io.emit('number', number.phoneNumber);
+				let obj = {
+					sid: number.sid,
+					nr: number.phoneNumber
+				}
+
+				io.emit('number', obj);
 
 			});
 
@@ -114,14 +144,14 @@ router.get('/', function(req, res, next) {
 
 			client.messages.get({From: msg.from, To: msg.to}, function(err, response) {
 
-			    response.messages.forEach(function(messages) {
+				response.messages.forEach(function(messages) {
 
 					io.emit('message', {
 						date: messages.dateCreated,
 						body: messages.body
 					});
 
-			    });
+				});
 
 			});
 
@@ -130,14 +160,14 @@ router.get('/', function(req, res, next) {
 			//
 			client.messages.get({From: msg.to, To: msg.from}, function(err, response) {
 
-			    response.messages.forEach(function(messages) {
+				response.messages.forEach(function(messages) {
 
 					io.emit('message', {
 						date: messages.dateCreated,
 						body: messages.body
 					});
 
-			    });
+				});
 
 			});
 
@@ -150,17 +180,37 @@ router.get('/', function(req, res, next) {
 
 			client.sendMessage({
 
-			    to: msg.to,
-			    from: msg.from,
-			    body: msg.message
+				to: msg.to,
+				from: msg.from,
+				body: msg.message
 
 			}, function(err, data) {
 
-			    if (!err) {
+				if (!err) {
 
-			    	io.emit('message', data.body);
+					io.emit('message', data.body);
 
-			    }
+				}
+			});
+
+		});
+
+		//
+		//	Send a message for a given number
+		//
+		socket.on('delete', function(sid, callback) {
+
+			client.incomingPhoneNumbers(sid).delete(function(err, deleted) {
+
+				if (err)
+				{
+					console.log(err);
+				}
+				else
+				{
+					callback();
+				}
+
 			});
 
 		});
@@ -168,9 +218,51 @@ router.get('/', function(req, res, next) {
 		//
 		//	Buy new numbers
 		//
-		socket.on('buy', function(){
+		socket.on('buy', function(country) {
 
-			io.emit('bought', "+31231231232");
+			// 
+			//	First, search for available phone numbers
+			// 
+			client.availablePhoneNumbers(country).local.get().then(function(searchResults) {
+
+				// 
+				//	handle the case where there are no numbers found
+				// 
+				if (searchResults.availablePhoneNumbers.length < 1) 
+				{
+					io.emit('alert', 'No numbers found with that area code');
+				}
+
+				// 
+				// 	Okay, so there are some available numbers.  Now, let's buy 
+				// 	the first one in the list.  Return the promise created by 
+				// 	the next call to Twilio:
+				//
+				return client.incomingPhoneNumbers.create({
+
+					phoneNumber: searchResults.availablePhoneNumbers[0].phoneNumber,
+					voiceUrl:'https://demo.twilio.com/welcome/voice',
+					smsUrl:'https://demo.twilio.com/welcome/sms/reply'
+
+				});
+
+			}).then(function(number) {
+
+				let obj = {
+					sid: number.sid,
+					nr: number.phoneNumber
+				};
+
+				// 
+				//	We bought the number!  Everything worked!
+				// 
+				io.emit('bought', obj);
+
+			}).fail(function(error) {
+
+				io.emit('alert', 'Number purchase failed! Reason: ' + error.message);
+
+			});
 
 		});
 
@@ -180,7 +272,7 @@ router.get('/', function(req, res, next) {
 	//	Render the page
 	//
 	res.render('index', {
-		title: 'Express'
+		title: 'bPhone'
 	});
 
 });
