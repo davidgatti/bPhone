@@ -186,11 +186,18 @@ router.get('/', function(req, res, next) {
 
 			}, function(err, data) {
 
-				if (!err) {
-
-					io.emit('message', data.body);
-
+				if (err) 
+				{
+					io.emit('alert', err.message);
 				}
+				else
+				{
+					io.emit('message', {
+						date: data.dateCreated,
+						body: data.body
+					});
+				}
+				
 			});
 
 		});

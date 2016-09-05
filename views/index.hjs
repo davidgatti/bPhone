@@ -79,6 +79,7 @@
 					.append(
 						$('<button>')
 						.text('new message to')
+						.attr('class', 'btnNewMessage')
 						)
 					)
 				)
@@ -203,6 +204,18 @@
 		$('#m').val('');
 
 	});
+
+	//
+	//	Create a new conversation
+	//
+	$('#numbers').on("click", ".btnNewMessage", function() {
+
+		var nr = $(this).prev().val()
+	
+		$(this).parent().parent().append($('<li>').text(nr).attr('class', 'number'))
+
+	});
+
 
 	//
 	//	Delete number
