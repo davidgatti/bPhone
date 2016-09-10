@@ -7,12 +7,20 @@
 		<script type="text/javascript" src="javascripts/jquery-3.1.0.min.js"></script>
 		<script type="text/javascript" src="javascripts/socket.io-1.4.5.js"></script>
 
-<style type="text/css">
-	#buy
-	{
-		float:left;
-	}
-</style>
+		<style type="text/css">
+
+			#buy
+			{
+				float: left;
+			}
+
+			.newMessage
+			{
+				background-color: yellow;
+			}
+
+		</style>
+
 	</head>
 
 	<body>
@@ -56,6 +64,30 @@
 	});
 
 	//
+	//
+	//
+	socket.on('newMessage', function(obj) {
+
+		console.log(obj)
+		$("#numbers").children().each(function() {
+
+			if($(this).attr('id') == obj.to)
+			{
+				$(this).children().children().each(function() {
+
+					if($(this).attr('id') == obj.from)
+					{
+						$(this).addClass("newMessage");
+					}
+
+				});
+			}
+
+		});
+
+	});
+
+	//
 	//	Render account numbers
 	//
 	socket.on('number', function(msg) {
@@ -63,6 +95,7 @@
 		$('#numbers')
 		.append(
 			$('<li>')
+			.attr('id', msg.nr.slice(1))
 			.text(msg.nr)
 			.append(
 				$('<button>')
@@ -84,7 +117,7 @@
 					)
 				)
 			)
-			
+
 	});
 
 	//
@@ -93,7 +126,9 @@
 	socket.on('fromNumber', function(msg) {
 
 		$("ul li:contains('" + msg.to + "') > ul")
-		.append($('<li class="number">')
+		.append($('<li>')
+			.attr('class', 'number')
+			.attr('id', msg.from.slice(1))
 			.text(msg.from))
 
 	});
@@ -109,9 +144,9 @@
 		//	Add a message as it comes no mater the order
 		//
 		$('#messages').append($('<li>').text(msg.date + ": " + msg.body));
-		
+
 		//
-		//	Push the message that we got a array, which will be used to 
+		//	Push the message that we got a array, which will be used to
 		//	storing all the messages.
 		//
 		db.push(msg)
@@ -121,12 +156,12 @@
 		//
 		db.sort(function (a, b) {
 
-			if (a.date > b.date) 
+			if (a.date > b.date)
 			{
 				return 1;
 			}
 
-			if (a.date < b.date) 
+			if (a.date < b.date)
 			{
 				return -1;
 			}
@@ -137,11 +172,11 @@
 			return 0;
 
 		});
-		
+
 		//
 		//	Once the array is sorted, we go over the LI list, and replace the
 		//	content of the LI with the new ordered messages.
-		//	
+		//
 		//	With this solution we can reorder the messages as they come. No
 		//	matter how the server sends them to us.
 		//
@@ -150,7 +185,7 @@
 			$(this).text(db[index].date+ ": " +db[index].body);
 
 		});
-		
+
 	});
 
 	//
@@ -211,8 +246,15 @@
 	$('#numbers').on("click", ".btnNewMessage", function() {
 
 		var nr = $(this).prev().val()
-	
-		$(this).parent().parent().append($('<li>').text(nr).attr('class', 'number'))
+
+		$(this)
+		.parent()
+		.parent()
+		.append(
+			$('<li>')
+			.text(nr)
+			.attr('class', 'number')
+			)
 
 	});
 
@@ -224,7 +266,7 @@
 
 		var nrElement = $(this);
 		var sid = $(this).attr('value');
-		
+
 		socket.emit('delete', sid, function() {
 
 			nrElement.parent().remove();
@@ -237,6 +279,8 @@
 	//	Clicking on a number
 	//
 	$('#numbers').on("click", '.number', function() {
+
+		$(this).removeClass("newMessage");
 
 		db = [];
 
@@ -543,4 +587,20 @@
 		$('#countries').append($('<option>').attr("value", key).text(countries[key]))
 	}
 
+(function ($) {
+	$.fn.blink = function (options) {
+		var defaults = { delay: 500 };
+		var options = $.extend(defaults, options);
+		return $(this).each(function (idx, itm) {
+			setInterval(function () {
+				if ($(itm).css("visibility") === "visible") {
+					$(itm).css('visibility', 'hidden');
+				}
+				else {
+					$(itm).css('visibility', 'visible');
+				}
+			}, options.delay);
+		});
+	}
+} (jQuery))
 </script>

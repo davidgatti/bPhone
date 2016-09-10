@@ -28,7 +28,7 @@ router.get('/', function(req, res, next) {
 	//
 	//	Attach the Web Socket to the NodeJS server
 	//
-	let io = require('socket.io').listen(req.socket.server);
+	let io = process.bphone;
 
 	//
 	//	Listen for connections
@@ -135,6 +135,8 @@ router.get('/', function(req, res, next) {
 
 			console.log('user disconnected');
 
+			io.emit('alert', "Browser disconnected, refresh the page.");
+
 		});
 
 		//
@@ -142,6 +144,9 @@ router.get('/', function(req, res, next) {
 		//
 		socket.on('messages', function(msg) {
 
+			//
+			//	List all the messages for a given number
+			//
 			client.messages.get({From: msg.from, To: msg.to}, function(err, response) {
 
 				response.messages.forEach(function(messages) {
