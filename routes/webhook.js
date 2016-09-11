@@ -2,22 +2,27 @@
 
 var express = require('express');
 var router = express.Router();
+var client = require('twilio')(process.env.ACCOUNT_SID, process.env.AUTH_TOKEN);
 
 /* GET home page. */
 router.post('/', function(req, res, next) {
-
-	//
-	//	Attach the Web Socket to the NodeJS server
-	//
-	let io = process.bphone;
 
 	let obj = {
 		to: req.body.To.slice(1),
 		from: req.body.From.slice(1)
 	};
 
-	io.emit('alert', 'New Message to: ' + req.body.To);
-	io.emit('newMessage', obj);
+	client.messages(req.body.Sid).get(function(err, message) {
+
+    	process.bphone.emit('message', {
+            date: message.dateCreated,
+            body: message.body
+          });
+
+	});
+
+	process.bphone.emit('alert', 'New Message to: ' + req.body.To);
+	process.bphone.emit('newMessage', obj);
 
     res.status(200);
     res.end('OK');

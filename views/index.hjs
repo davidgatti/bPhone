@@ -68,7 +68,6 @@
 	//
 	socket.on('newMessage', function(obj) {
 
-		console.log(obj)
 		$("#numbers").children().each(function() {
 
 			if($(this).attr('id') == obj.to)
