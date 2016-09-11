@@ -12,8 +12,8 @@ router.post('/', function(req, res, next) {
 	let io = process.bphone;
 
 	let obj = {
-		from: req.body.To.slice(1),
-		to: req.body.From.slice(1)
+		to: req.body.To.slice(1),
+		from: req.body.From.slice(1)
 	};
 
 	io.emit('alert', 'New Message to: ' + req.body.To);
