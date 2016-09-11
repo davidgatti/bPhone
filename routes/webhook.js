@@ -12,7 +12,7 @@ router.post('/', function(req, res, next) {
 		from: req.body.From.slice(1)
 	};
 
-	client.messages(req.body.Sid).get(function(err, message) {
+	client.messages(req.body.SmsMessageSid).get(function(err, message) {
 
     	process.bphone.emit('message', {
             date: message.dateCreated,
