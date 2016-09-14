@@ -21,6 +21,7 @@ router.post('/', function(req, res, next) {
 		//	Send to the front-end the new message
 		//
     	process.bphone.emit('message', {
+    		origin: "webhook",
             date: message.dateCreated,
             body: message.body
         });
