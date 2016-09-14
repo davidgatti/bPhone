@@ -175,6 +175,7 @@ process.bphone = require('socket.io').listen(server);
         response.messages.forEach(function(messages) {
 
           socket.emit('message', {
+            origin: "click",
             date: messages.dateCreated,
             body: messages.body
           });
@@ -191,6 +192,7 @@ process.bphone = require('socket.io').listen(server);
         response.messages.forEach(function(messages) {
 
           socket.emit('message', {
+            origin: "click",
             date: messages.dateCreated,
             body: messages.body
           });

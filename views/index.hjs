@@ -144,7 +144,7 @@
 		//	Only update the messages view if it is active. Meaning someone
 		//	clicked on a number and the conversation was displayed.
 		//
-		if($('#messages > li').length > 0 && msg.origin != 'webhook')
+		if($('#messages > li').length > 0 || msg.origin == 'click')
 		{
 			//
 			//	Add a message as it comes no mater the order
