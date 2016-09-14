@@ -64,7 +64,8 @@
 	});
 
 	//
-	//
+	//	When the app receives a new message we highlight the number that
+	//	sent us the message.
 	//
 	socket.on('newMessage', function(obj) {
 
@@ -140,50 +141,57 @@
 	socket.on('message', function(msg) {
 
 		//
-		//	Add a message as it comes no mater the order
+		//	Only update the messages view if it is active. Meaning someone
+		//	clicked on a number and the conversation was displayed.
 		//
-		$('#messages').append($('<li>').text(msg.date + ": " + msg.body));
-
-		//
-		//	Push the message that we got a array, which will be used to
-		//	storing all the messages.
-		//
-		db.push(msg)
-
-		//
-		//	Sort the array based on the data
-		//
-		db.sort(function (a, b) {
-
-			if (a.date > b.date)
-			{
-				return 1;
-			}
-
-			if (a.date < b.date)
-			{
-				return -1;
-			}
+		if($('#messages > li').length > 0)
+		{
+			//
+			//	Add a message as it comes no mater the order
+			//
+			$('#messages').append($('<li>').text(msg.date + ": " + msg.body));
 
 			//
-			//	a must be equal to b
+			//	Push the message that we got a array, which will be used to
+			//	storing all the messages.
 			//
-			return 0;
+			db.push(msg)
 
-		});
+			//
+			//	Sort the array based on the data
+			//
+			db.sort(function (a, b) {
 
-		//
-		//	Once the array is sorted, we go over the LI list, and replace the
-		//	content of the LI with the new ordered messages.
-		//
-		//	With this solution we can reorder the messages as they come. No
-		//	matter how the server sends them to us.
-		//
-		$('#messages > li').each(function(index) {
+				if (a.date > b.date)
+				{
+					return 1;
+				}
 
-			$(this).text(db[index].date+ ": " +db[index].body);
+				if (a.date < b.date)
+				{
+					return -1;
+				}
 
-		});
+				//
+				//	a must be equal to b
+				//
+				return 0;
+
+			});
+
+			//
+			//	Once the array is sorted, we go over the LI list, and replace the
+			//	content of the LI with the new ordered messages.
+			//
+			//	With this solution we can reorder the messages as they come. No
+			//	matter how the server sends them to us.
+			//
+			$('#messages > li').each(function(index) {
+
+				$(this).text(db[index].date+ ": " +db[index].body);
+
+			});
+		}
 
 	});
 
