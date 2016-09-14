@@ -3,7 +3,6 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "postinstall": "npm start",
     "start": "nf start"
   },
   "dependencies": {
