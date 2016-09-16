@@ -1,12 +1,14 @@
 'use strict';
 
-var express = require('express');
-var router = express.Router();
-var client = require('twilio')(process.env.ACCOUNT_SID, process.env.AUTH_TOKEN);
+let express = require('express');
+let router = express.Router();
+let client = require('twilio')(process.env.ACCOUNT_SID, process.env.AUTH_TOKEN);
 
-/* GET home page. */
 router.post('/', function(req, res, next) {
 
+	//
+	//	Saving necessary data from the Twilio post
+	//
 	let obj = {
 		to: req.body.To.slice(1),
 		from: req.body.From.slice(1)
@@ -33,6 +35,9 @@ router.post('/', function(req, res, next) {
 
 	});
 
+	//
+	//	Let Twilio know that we got the message.
+	//
     res.status(200);
     res.end('OK');
 

@@ -31,298 +31,325 @@ server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
 
-var client = require('twilio')(process.env.ACCOUNT_SID, process.env.AUTH_TOKEN);
-
-process.bphone = '';
-process.bphone = require('socket.io').listen(server);
-
-  //
-  //  Listen for connections
-  //
-  process.bphone.on('connection', function(socket) {
-
-  //
-  //  Check if the account is active or not
-  //
-  client.accounts(process.env.ACCOUNT_SID).get(function(err, account) {
-
-    if(err)
-    {
-      socket.emit('alert', err.message);
-    }
-    else
-    {
-      if(account.status != 'active')
-      {
-        socket.emit('alert', account.status);
-      }
-    }
-
-  });
-
-    //
-    //  Settings
-    //
-    socket.setMaxListeners(20);
-
-    //
-    //  List all the numbers
-    //
-    client.incomingPhoneNumbers.list(function(err, data) {
-
-      if(err)
-      {
-        return 1;
-      }
-
-      data.incomingPhoneNumbers.forEach(function(number) {
-
-        client.messages.get({To: number.phoneNumber}, function(err, response) {
-
-          response.messages.reduce(function(array, element) {
-
-            //
-            //  Add at least one element
-            //
-            if(array.length == 0)
-            {
-              array.push(element.from);
-            }
-
-            //
-            //  Value used to store if a unique number is being
-            //  found
-            //
-            let count = 0;
-
-            //
-            //  Look for unique numbers
-            //
-            for(let key in array)
-            {
-              //
-              //  If number different then increment, if the same
-              //  decrement
-              //
-              if(array[key] != element.from)
-              {
-                count++;
-              }
-              else
-              {
-                count--;
-              }
-            }
-
-            //
-            //  If the reminder is one, we know we have to add the
-            //  number to the array
-            //
-            if(count == 1)
-            {
-              array.push(element.from);
-            }
-
-            //
-            //  Return the array fro the next loop
-            //
-            return array;
-
-          }, [])
-          .forEach(function(ble) {
-
-            let obj = {
-              from: ble,
-              to: number.phoneNumber
-            }
+//	   _____  ____   _____ _  ________ _______      _____ ____
+//	  / ____|/ __ \ / ____| |/ /  ____|__   __|    |_   _/ __ \
+//	 | (___ | |  | | |    | ' /| |__     | |         | || |  | |
+//	  \___ \| |  | | |    |  < |  __|    | |         | || |  | |
+//	  ____) | |__| | |____| . \| |____   | |        _| || |__| |
+//	 |_____/ \____/ \_____|_|\_\______|  |_|       |_____\____/
+//
+
+//
+//	Initialize the Twilio module
+//
+let client = require('twilio')(process.env.ACCOUNT_SID, process.env.AUTH_TOKEN);
+
+//
+//  Create a socket IO server and attach the server to the already established
+//  connection by the http server
+//
+require('socket.io').listen(server).on('connection', function(socket) {
+
+	//
+	//  Check if everything is ok with the account, and the connection with
+	//  the Twilio bac-end.
+	//
+	client.accounts(process.env.ACCOUNT_SID).get(function(err, account) {
+
+		if(err)
+		{
+			socket.emit('alert', err.message);
+		}
+		else
+		{
+			if(account.status != 'active')
+			{
+				socket.emit('alert', account.status);
+			}
+		}
+
+	});
+
+	//
+	//  Change some basic Socket IO settings
+	//
+	socket.setMaxListeners(20);
+
+	//
+	//  1.	Ask Twilio to send us back a list of all our active numbers
+	//
+	client.incomingPhoneNumbers.list(function(err, data) {
+
+		//
+		//	If there is an error show it in the UI
+		//
+		if(err)
+		{
+			socket.emit('alert', err.message);
+
+			return 1;
+		}
+
+		data.incomingPhoneNumbers.forEach(function(number) {
+
+			client.messages.get({To: number.phoneNumber}, function(err, response) {
+
+				response.messages.reduce(function(array, element) {
+
+					//
+					//  Add at least one element
+					//
+					if(array.length == 0)
+					{
+						array.push(element.from);
+					}
+
+					//
+					//  Value used to store if a unique number is being
+					//  found
+					//
+					let count = 0;
+
+					//
+					//  Look for unique numbers
+					//
+					for(let key in array)
+					{
+						//
+						//  If number different then increment, if the same
+						//  decrement
+						//
+						if(array[key] != element.from)
+						{
+							count++;
+						}
+						else
+						{
+							count--;
+						}
+					}
 
-            socket.emit('fromNumber', obj);
+					//
+					//  If the reminder is one, we know we have to add the
+					//  number to the array
+					//
+					if(count == 1)
+					{
+						array.push(element.from);
+					}
 
-          });
+					//
+					//  Return the array fro the next loop
+					//
+					return array;
 
-        });
+				}, [])
+				.forEach(function(ble) {
 
-        let obj = {
-          sid: number.sid,
-          nr: number.phoneNumber
-        }
+					let obj = {
 
-        socket.emit('number', obj);
+						from: ble,
+						to: number.phoneNumber
 
-      });
+					}
 
-    });
+					socket.emit('fromNumber', obj);
 
-    //
-    //  Do something in disconnect.
-    //
-    socket.on('disconnect', function(){
+				});
 
-      console.log('user disconnected');
+			});
 
-    });
+			let obj = {
 
-    //
-    // List all the messages for a given number
-    //
-    socket.on('messages', function(msg) {
+				sid: number.sid,
+				nr: number.phoneNumber
 
-      //
-      //  List all the messages for a given number
-      //
-      client.messages.get({From: msg.from, To: msg.to}, function(err, response) {
+			}
 
-        response.messages.forEach(function(messages) {
+			socket.emit('number', obj);
 
-          socket.emit('message', {
-            origin: "click",
-            date: messages.dateCreated,
-            body: messages.body
-          });
+		});
 
-        });
+	});
 
-      });
+	//
+	//  Let the user know if the communication with the back-end was lost
+	//
+	socket.on('disconnect', function() {
 
-      //
-      //  List all the messages for a given number
-      //
-      client.messages.get({From: msg.to, To: msg.from}, function(err, response) {
+		socket.emit('alert', "You've lost connection - Refresh");
 
-        response.messages.forEach(function(messages) {
+	});
 
-          socket.emit('message', {
-            origin: "click",
-            date: messages.dateCreated,
-            body: messages.body
-          });
+	//
+	// List all the messages for a given number
+	//
+	socket.on('messages', function(msg) {
 
-        });
+		//
+		//  List all the messages for a given number
+		//
+		client.messages.get({From: msg.from, To: msg.to}, function(err, response) {
 
-      });
+			response.messages.forEach(function(messages) {
 
-    });
+				socket.emit('message', {
 
-    //
-    //  Send a message for a given number
-    //
-    socket.on('sendMessage', function(msg) {
+					origin: "click",
+					date: messages.dateCreated,
+					body: messages.body
 
-      client.sendMessage({
+				});
 
-        to: msg.to,
-        from: msg.from,
-        body: msg.message
+			});
 
-      }, function(err, data) {
+		});
 
-        if (err)
-        {
-          socket.emit('alert', err.message);
-        }
-        else
-        {
-          socket.emit('message', {
-            date: data.dateCreated,
-            body: data.body
-          });
-        }
+		//
+		//  List all the messages for a given number
+		//
+		client.messages.get({From: msg.to, To: msg.from}, function(err, response) {
 
-      });
+			response.messages.forEach(function(messages) {
 
-    });
+				socket.emit('message', {
 
-    //
-    //  Send a message for a given number
-    //
-    socket.on('delete', function(sid, callback) {
+					origin: "click",
+					date: messages.dateCreated,
+					body: messages.body
 
-      client.incomingPhoneNumbers(sid).delete(function(err, deleted) {
+				});
 
-        if (err)
-        {
-          console.log(err);
-        }
-        else
-        {
-          callback();
-        }
+			});
 
-      });
+		});
 
-    });
+	});
 
-    //
-    //  Buy new numbers
-    //
-    socket.on('buy', function(country) {
+	//
+	//  Send a message for a given number
+	//
+	socket.on('sendMessage', function(msg) {
 
-      //
-      //  First, search for available phone numbers
-      //
-      client.availablePhoneNumbers(country).local.get().then(function(searchResults) {
+		client.sendMessage({
 
-        //
-        //  handle the case where there are no numbers found
-        //
-        if (searchResults.availablePhoneNumbers.length < 1)
-        {
-          socket.emit('alert', 'No numbers found with that area code');
-        }
+			to: msg.to,
+			from: msg.from,
+			body: msg.message
 
-        //
-        //  Okay, so there are some available numbers.  Now, let's buy
-        //  the first one in the list.  Return the promise created by
-        //  the next call to Twilio:
-        //
-        return client.incomingPhoneNumbers.create({
+		}, function(err, data) {
 
-          phoneNumber: searchResults.availablePhoneNumbers[0].phoneNumber,
-          voiceUrl:'https://demo.twilio.com/welcome/voice',
-          smsUrl:'https://demo.twilio.com/welcome/sms/reply'
+			if(err)
+			{
+				socket.emit('alert', err.message);
+			}
+			else
+			{
+				socket.emit('message', {
 
-        });
+					date: data.dateCreated,
+					body: data.body
 
-      }).then(function(number) {
+				});
+			}
 
-        let obj = {
-          sid: number.sid,
-          nr: number.phoneNumber
-        };
+		});
 
-        //
-        //  We bought the number!  Everything worked!
-        //
-        socket.emit('bought', obj);
+	});
 
-      }).fail(function(error) {
+	//
+	//  Send a message for a given number
+	//
+	socket.on('delete', function(sid, callback) {
 
-        socket.emit('alert', 'Number purchase failed! Reason: ' + error.message);
+		client.incomingPhoneNumbers(sid).delete(function(err, deleted) {
 
-      });
+			if(err)
+			{
+				socket.emit('alert', err.message);
+			}
+			else
+			{
+				callback();
+			}
 
-    });
+		});
 
-  });
+	});
+
+	//
+	//  Buy new numbers
+	//
+	socket.on('buy', function(country) {
+
+		//
+		//  First, search for available phone numbers
+		//
+		client.availablePhoneNumbers(country).local.get().then(function(searchResults) {
+
+			//
+			//  handle the case where there are no numbers found
+			//
+			if (searchResults.availablePhoneNumbers.length < 1)
+			{
+				socket.emit('alert', 'No numbers found with that area code');
+			}
+
+			//
+			//  Okay, so there are some available numbers.  Now, let's buy
+			//  the first one in the list.  Return the promise created by
+			//  the next call to Twilio:
+			//
+			return client.incomingPhoneNumbers.create({
+
+				phoneNumber: searchResults.availablePhoneNumbers[0].phoneNumber,
+				voiceUrl:'https://demo.twilio.com/welcome/voice',
+				smsUrl:'https://demo.twilio.com/welcome/sms/reply'
+
+			});
+
+		}).then(function(number) {
+
+			let obj = {
+
+				sid: number.sid,
+				nr: number.phoneNumber
+
+			};
+
+			//
+			//  We bought the number!  Everything worked!
+			//
+			socket.emit('bought', obj);
+
+		}).fail(function(error) {
+
+			socket.emit('alert', 'Number purchase failed! Reason: ' + error.message);
+
+		});
+
+	});
+
+});
 
 /**
  * Normalize a port into a number, string, or false.
  */
 
 function normalizePort(val) {
-  var port = parseInt(val, 10);
+	var port = parseInt(val, 10);
 
-  if (isNaN(port)) {
-    // named pipe
-    return val;
-  }
+	if (isNaN(port)) {
+		// named pipe
+		return val;
+	}
 
-  if (port >= 0) {
-    // port number
-    return port;
-  }
+	if (port >= 0) {
+		// port number
+		return port;
+	}
 
-  return false;
+	return false;
 }
 
 /**
@@ -330,27 +357,27 @@ function normalizePort(val) {
  */
 
 function onError(error) {
-  if (error.syscall !== 'listen') {
-    throw error;
-  }
+	if (error.syscall !== 'listen') {
+		throw error;
+	}
 
-  var bind = typeof port === 'string'
-    ? 'Pipe ' + port
-    : 'Port ' + port;
+	var bind = typeof port === 'string'
+		? 'Pipe ' + port
+		: 'Port ' + port;
 
-  // handle specific listen errors with friendly messages
-  switch (error.code) {
-    case 'EACCES':
-      console.error(bind + ' requires elevated privileges');
-      process.exit(1);
-      break;
-    case 'EADDRINUSE':
-      console.error(bind + ' is already in use');
-      process.exit(1);
-      break;
-    default:
-      throw error;
-  }
+	// handle specific listen errors with friendly messages
+	switch (error.code) {
+		case 'EACCES':
+			console.error(bind + ' requires elevated privileges');
+			process.exit(1);
+			break;
+		case 'EADDRINUSE':
+			console.error(bind + ' is already in use');
+			process.exit(1);
+			break;
+		default:
+			throw error;
+	}
 }
 
 /**
@@ -358,9 +385,9 @@ function onError(error) {
  */
 
 function onListening() {
-  var addr = server.address();
-  var bind = typeof addr === 'string'
-    ? 'pipe ' + addr
-    : 'port ' + addr.port;
-  debug('Listening on ' + bind);
+	var addr = server.address();
+	var bind = typeof addr === 'string'
+		? 'pipe ' + addr
+		: 'port ' + addr.port;
+	debug('Listening on ' + bind);
 }
