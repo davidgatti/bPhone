@@ -8,9 +8,7 @@ router.get('/', function(req, res, next) {
 	//
 	//	Render the page
 	//
-	res.render('index', {
-		title: 'bPhone'
-	});
+	res.render('index');
 
 });
 

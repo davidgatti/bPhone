@@ -2,7 +2,7 @@
 <html>
 	<head>
 
-		<title>{{title}}</title>
+		<title>bPhone</title>
 
 		<script type="text/javascript" src="javascripts/jquery-3.1.0.min.js"></script>
 		<script type="text/javascript" src="javascripts/socket.io-1.4.5.js"></script>
@@ -39,7 +39,6 @@
 		<ul id="messages"></ul>
 
 		<input id="m" autocomplete="off" />
-
 		<input id="to" autocomplete="off" />
 		<input id="from" autocomplete="off" />
 
@@ -52,11 +51,22 @@
 <script>
 
 	//
-	//	Create a Socket.IO object
+	//	Connect to the socket server and create a Socket.IO object
 	//
 	var socket = io();
-	var country = '';
 
+//////	  ____  _   _
+//////	 / __ \| \ | |
+//////	| |  | |  \| |
+//////	| |  | | . ` |
+//////	| |__| | |\  |
+//////	 \____/|_| \_|
+//////
+
+	//
+	//	Display a banner with possible various messages from the back-end
+	//	The majority will be errors.
+	//
 	socket.on('alert', function(msg) {
 
 		$('#alert').text(msg);
@@ -77,6 +87,10 @@
 
 					if($(this).attr('id') == obj.from)
 					{
+						//
+						//	Sett the yellow class to show in the UI which
+						//	number got the new message.
+						//
 						$(this).addClass("newMessage");
 					}
 
@@ -88,20 +102,20 @@
 	});
 
 	//
-	//	Render account numbers
+	//	Displaying all numbers in our account.
 	//
 	socket.on('number', function(msg) {
 
 		$('#numbers')
 		.append(
 			$('<li>')
-			.attr('id', msg.nr.slice(1))
-			.text(msg.nr)
+			.attr('id', msg.nr.slice(1)) // remove the + char.
+			.text(msg.nr) // Display the number
 			.append(
 				$('<button>')
 				.text('delete')
 				.attr('class', 'delete')
-				.attr('value', msg.sid)
+				.attr('value', msg.sid) // add the SID number because twill deletes numbers based on this value, and not the number it self.
 				)
 			.append(
 				$('<ul>')
@@ -121,7 +135,7 @@
 	});
 
 	//
-	//	Render
+	//	Display all the phone numbers that interacted with our numbers.
 	//
 	socket.on('fromNumber', function(msg) {
 
@@ -133,34 +147,39 @@
 
 	});
 
+	//
+	//	Create an array that will be used to store all the messages
+	//	for a specific conversation.
+	//
 	var db = [];
 
 	//
-	//	When the server sends us a message we display it on the page
+	//	The server sends to the front-end one message at the time. Each time
+	//	this happens we react to it.
 	//
 	socket.on('message', function(msg) {
 
 		//
 		//	Only update the messages view if it is active. Meaning someone
-		//	clicked on a number and the conversation was displayed.
+		//	clicked on a number and the conversation is being displayed.
 		//
 		if($('#messages > li').length > 0 || msg.origin == 'click')
 		{
 			//
-			//	Add a message as it comes no mater the order
+			//	Add the message on the page as it comes no mater the order/
 			//
 			$('#messages').append($('<li>').text(msg.date + ": " + msg.body));
 
 			//
-			//	Push the message that we got a array, which will be used to
+			//	Push the message that we got a array, which will be used for
 			//	storing all the messages.
 			//
 			db.push(msg)
 
 			//
-			//	Sort the array based on the data
+			//	Sort the array based on the date
 			//
-			db.sort(function (a, b) {
+			db.sort(function(a, b) {
 
 				if (a.date > b.date)
 				{
@@ -196,7 +215,7 @@
 	});
 
 	//
-	//
+	//	After buying a number we update the interface with that bought number
 	//
 	socket.on('bought', function(msg) {
 
@@ -226,10 +245,17 @@
 
 	});
 
+//////	  _____ _      _____ _____ _  __
+//////	 / ____| |    |_   _/ ____| |/ /
+//////	| |    | |      | || |    | ' /
+//////	| |    | |      | || |    |  <
+//////	| |____| |____ _| || |____| . \
+//////	 \_____|______|_____\_____|_|\_\
+
 	//
-	//	Send a message
+	//	Send a text message to the selected number
 	//
-	$('#button').click(function() {
+	$('#button').on("click", function() {
 
 		var to = $('#to').val();
 		var from = $('#from').val();
@@ -248,7 +274,8 @@
 	});
 
 	//
-	//	Create a new conversation
+	//	React when we want to start a new conversation with a new number
+	//	that we never spoke to.
 	//
 	$('#numbers').on("click", ".btnNewMessage", function() {
 
@@ -265,9 +292,8 @@
 
 	});
 
-
 	//
-	//	Delete number
+	//	Delete the selected number
 	//
 	$('#numbers').on("click", '.delete', function() {
 
@@ -283,7 +309,8 @@
 	});
 
 	//
-	//	Clicking on a number and get all the messages.
+	//	When we click on a number, we are going to ask Twilio for the whole
+	//	conversation for that number.
 	//
 	$('#numbers').on("click", '.number', function() {
 
@@ -309,16 +336,10 @@
 			from: from
 		}
 
+		//
+		//	Ask the back-end for all the messages.
+		//
 		socket.emit('messages', obj);
-
-	});
-
-	//
-	//	Save the selected country
-	//
-	$("#countries").change(function () {
-
-		country = $(this).val();
 
 	});
 
@@ -327,9 +348,25 @@
 	//
 	$('#buy').on("click", function() {
 
+		//
+		//	Get selected country
+		//
+		var country = $("#countries").val();
+
+		//
+		//	Ask the back-end to buy a new number from the selected country
+		//
 		socket.emit('buy', country);
 
 	});
+
+//////	 _    _ ______ _      _____  ______ _____   _____
+//////	| |  | |  ____| |    |  __ \|  ____|  __ \ / ____|
+//////	| |__| | |__  | |    | |__) | |__  | |__) | (___
+//////	|  __  |  __| | |    |  ___/|  __| |  _  / \___ \
+//////	| |  | | |____| |____| |    | |____| | \ \ ____) |
+//////	|_|  |_|______|______|_|    |______|_|  \_\_____/
+//////
 
 	//
 	//	DB of countries
@@ -587,27 +624,14 @@
 	};
 
 	//
-	//	Create the country list
+	//	Populate the drop down with all the countries
 	//
 	for(var key in countries)
 	{
-		$('#countries').append($('<option>').attr("value", key).text(countries[key]))
+		$('#countries')
+		.append($('<option>')
+			.attr("value", key)
+			.text(countries[key]))
 	}
 
-(function ($) {
-	$.fn.blink = function (options) {
-		var defaults = { delay: 500 };
-		var options = $.extend(defaults, options);
-		return $(this).each(function (idx, itm) {
-			setInterval(function () {
-				if ($(itm).css("visibility") === "visible") {
-					$(itm).css('visibility', 'hidden');
-				}
-				else {
-					$(itm).css('visibility', 'visible');
-				}
-			}, options.delay);
-		});
-	}
-} (jQuery))
 </script>
