@@ -95,13 +95,24 @@
 	//
 	socket.on('newMessage', function(obj) {
 
+		//
+		//	Go over all the numbers and look for the one that got the new
+		//	message.
+		//
 		$("#numbers").children().each(function() {
 
 			//
 			//	Select one of our numbers that received the message.
 			//
-			if($(this).attr('id') == obj.to)
+			if($(this).attr('id') == obj.to.slice(1))
 			{
+				//
+				//	Use this variable to see if we did found a number or not.
+				//	If not it means the someone new sent us a message, and we
+				//	have to add this number to the list.
+				//
+				var exists = false;
+
 				//
 				//	Loop over each LI to find the right one
 				//
@@ -114,6 +125,11 @@
 					if($(this).text() == obj.from)
 					{
 						//
+						//	If we got a match, the no need to add the number
+						//
+						exists = true;
+
+						//
 						//	Sett the yellow class to show in the UI which
 						//	number got the new message.
 						//
@@ -121,6 +137,18 @@
 					}
 
 				});
+
+				//
+				//	If the number doesn't exist, add it to the list and
+				//	highlight it.
+				//
+				if(!exists)
+				{
+					$("#"+ obj.to.slice(1) + " > ul")
+					.append($('<li>')
+						.attr('class', 'number')
+						.text(obj.from).addClass("newMessage"))
+				}
 			}
 
 		});

@@ -10,7 +10,7 @@ router.post('/', function(req, res, next) {
 	//	Saving necessary data from the Twilio post
 	//
 	let obj = {
-		to: req.body.To.slice(1),
+		to: req.body.To,
 		from: req.body.From
 	};
 
