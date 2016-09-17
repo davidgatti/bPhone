@@ -232,7 +232,23 @@
 			//
 			$('#messages > li').each(function(index) {
 
-				$(this).text(db[index].date+ ": " +db[index].body);
+				var date = new Date(db[index].date);
+
+				var month = date.getMonth();
+				var day = date.getDay();
+				var year = date.getFullYear();
+				var hour = date.getHours();
+				var minute = date.getMinutes();
+				var secconds = date.getSeconds();
+
+				var formatedDate = pad(month, 2) + "-" +
+								   pad(day, 2) + "-" +
+								   year + " " +
+								   pad(hour, 2) + ":" +
+								   pad(minute, 2) + ":" +
+								   pad(secconds, 2);
+
+				$(this).text(formatedDate + " :: " + db[index].body);
 
 			});
 
@@ -668,6 +684,11 @@
 		.append($('<option>')
 			.attr("value", key)
 			.text(countries[key]))
+	}
+
+	function pad(str, max)
+	{
+		return str.toString().length < max ? pad("0" + str, max) : str;
 	}
 
 </script>
