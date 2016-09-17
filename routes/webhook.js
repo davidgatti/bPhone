@@ -11,7 +11,7 @@ router.post('/', function(req, res, next) {
 	//
 	let obj = {
 		to: req.body.To.slice(1),
-		from: req.body.From.slice(1)
+		from: req.body.From
 	};
 
 	//

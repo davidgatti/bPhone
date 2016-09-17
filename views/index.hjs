@@ -97,11 +97,21 @@
 
 		$("#numbers").children().each(function() {
 
+			//
+			//	Select one of our numbers that received the message.
+			//
 			if($(this).attr('id') == obj.to)
 			{
+				//
+				//	Loop over each LI to find the right one
+				//
 				$(this).children().children().each(function() {
 
-					if($(this).attr('id') == obj.from)
+					//
+					//	Once we have the desired LI, we change the background
+					//	color.
+					//
+					if($(this).text() == obj.from)
 					{
 						//
 						//	Sett the yellow class to show in the UI which
@@ -155,10 +165,9 @@
 	//
 	socket.on('fromNumber', function(msg) {
 
-		$("ul li:contains('" + msg.to + "') > ul")
+		$("#"+ msg.to.slice(1) + " > ul")
 		.append($('<li>')
 			.attr('class', 'number')
-			.attr('id', msg.from.slice(1))
 			.text(msg.from))
 
 	});

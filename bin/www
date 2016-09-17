@@ -90,74 +90,10 @@ require('socket.io').listen(server).on('connection', function(socket) {
 			return 1;
 		}
 
+		//
+		//	Loop over the array of phone numbers with all their properties.
+		//
 		data.incomingPhoneNumbers.forEach(function(number) {
-
-			client.messages.get({To: number.phoneNumber}, function(err, response) {
-
-				response.messages.reduce(function(array, element) {
-
-					//
-					//  Add at least one element
-					//
-					if(array.length == 0)
-					{
-						array.push(element.from);
-					}
-
-					//
-					//  Value used to store if a unique number is being
-					//  found
-					//
-					let count = 0;
-
-					//
-					//  Look for unique numbers
-					//
-					for(let key in array)
-					{
-						//
-						//  If number different then increment, if the same
-						//  decrement
-						//
-						if(array[key] != element.from)
-						{
-							count++;
-						}
-						else
-						{
-							count--;
-						}
-					}
-
-					//
-					//  If the reminder is one, we know we have to add the
-					//  number to the array
-					//
-					if(count == 1)
-					{
-						array.push(element.from);
-					}
-
-					//
-					//  Return the array fro the next loop
-					//
-					return array;
-
-				}, [])
-				.forEach(function(ble) {
-
-					let obj = {
-
-						from: ble,
-						to: number.phoneNumber
-
-					}
-
-					socket.emit('fromNumber', obj);
-
-				});
-
-			});
 
 			let obj = {
 
@@ -167,6 +103,77 @@ require('socket.io').listen(server).on('connection', function(socket) {
 			}
 
 			socket.emit('number', obj);
+
+				let array = [];
+			//
+			//	Retrieve all the messages for a specific number
+			//
+			client.messages.get({To: number.phoneNumber}, function(err, response) {
+
+				response.messages.forEach(function(message) {
+
+					let found = false
+
+					array.forEach(function(ble) {
+
+						if(ble == message.from)
+						{
+							found = true
+						}
+
+					});
+
+					if(!found)
+					{
+						let obj = {
+
+							from: message.from,
+							to: message.to
+
+						}
+
+						socket.emit('fromNumber', obj);
+						array.push(message.from)
+					}
+
+				});
+
+			});
+
+			//
+			//	Retrieve all the messages for a specific number
+			//
+			client.messages.get({From: number.phoneNumber}, function(err, response) {
+
+				response.messages.forEach(function(message) {
+
+					let found = false
+
+					array.forEach(function(ble) {
+
+						if(ble == message.to)
+						{
+							found = true
+						}
+
+					});
+
+					if(!found)
+					{
+						let obj = {
+
+							from: message.to,
+							to: message.from
+
+						}
+
+						socket.emit('fromNumber', obj);
+						array.push(message.to)
+					}
+
+				});
+
+			});
 
 		});
 
