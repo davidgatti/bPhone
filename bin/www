@@ -48,7 +48,9 @@ let client = require('twilio')(process.env.ACCOUNT_SID, process.env.AUTH_TOKEN);
 //  Create a socket IO server and attach the server to the already established
 //  connection by the http server
 //
-require('socket.io').listen(server).on('connection', function(socket) {
+process.bphone = require('socket.io').listen(server);
+
+process.bphone.on('connection', function(socket) {
 
 	//
 	//  Check if everything is ok with the account, and the connection with
