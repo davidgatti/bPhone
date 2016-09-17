@@ -9,6 +9,10 @@
 
 		<style type="text/css">
 
+			* {
+				font-family: monospace;
+			}
+
 			#buy
 			{
 				float: left;
@@ -17,6 +21,18 @@
 			.newMessage
 			{
 				background-color: yellow;
+			}
+
+			.loading
+			{
+				color: lightgrey;
+			}
+
+			.number:hover
+			{
+				text-decoration: underline;
+				cursor: pointer;
+				cursor: hand;
 			}
 
 		</style>
@@ -199,8 +215,8 @@
 			});
 
 			//
-			//	Once the array is sorted, we go over the LI list, and replace the
-			//	content of the LI with the new ordered messages.
+			//	Once the array is sorted, we go over the LI list, and replace
+			//	the content of the LI with the new ordered messages.
 			//
 			//	With this solution we can reorder the messages as they come. No
 			//	matter how the server sends them to us.
@@ -210,6 +226,11 @@
 				$(this).text(db[index].date+ ": " +db[index].body);
 
 			});
+
+			//
+			//	Remove the loading class
+			//
+			$(".loading").removeClass("loading");
 		}
 
 	});
@@ -314,7 +335,13 @@
 	//
 	$('#numbers').on("click", '.number', function() {
 
+		if($(this).hasClass("loading"))
+		{
+			return;
+		}
+
 		$(this).removeClass("newMessage");
+		$(this).addClass("loading");
 
 		db = [];
 
