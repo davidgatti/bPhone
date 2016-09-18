@@ -68,9 +68,11 @@
 		</div>
 
 		<div id="message" style="display: none;">
+			<p class="inline">Message:</p>
+
 			<input id="m" autocomplete="off" />
-			<input id="to" autocomplete="off" />
-			<input id="from" autocomplete="off" />
+			<input id="to" autocomplete="off" style="display: none;"/>
+			<input id="from" autocomplete="off" style="display: none;"/>
 
 			<button id="button" value="">Send</button>
 		</div>
