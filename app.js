@@ -6,9 +6,6 @@ var cookieParser = require('cookie-parser');
 
 var app = express();
 
-
-console.log(process.env)
-
 //
 //	view engine setup
 //
