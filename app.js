@@ -24,7 +24,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 //
 app.use(function(req, res, next) {
 
-	console.log(req.headers.host);
+	process.env.BASE_URL = req.headers.host;
 	next();
 
 });

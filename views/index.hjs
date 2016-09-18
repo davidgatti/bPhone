@@ -43,12 +43,15 @@
 
 		<p id="alert"></p>
 
+		<div>
+			<p>Buy a new number:</p>
+			<button id="buy">Buy</button>
+			<select id="countries"></select>
+		</div>
+
 		<p>Numbers:</p>
 
-		<ul id="numbers">
-			<li id="buy">Buy new number</li>
-			<select id="countries"></select>
-		</ul>
+		<ul id="numbers"></ul>
 
 		<p>Messages:</p>
 
@@ -426,17 +429,20 @@
 	//
 	//	React to buy click button
 	//
-	$('#buy').on("click", function() {
+	$("#buy").on("click", function() {
 
-		//
-		//	Get selected country
-		//
-		var country = $("#countries").val();
+		if(confirm("Do you want to buy a new number?!") == true)
+		{
+			//
+			//	Get selected country
+			//
+			var country = $("#countries").val();
 
-		//
-		//	Ask the back-end to buy a new number from the selected country
-		//
-		socket.emit('buy', country);
+			//
+			//	Ask the back-end to buy a new number from the selected country
+			//
+			socket.emit('buy', country);
+		}
 
 	});
 

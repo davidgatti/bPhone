@@ -312,8 +312,9 @@ process.bphone.on('connection', function(socket) {
 			return client.incomingPhoneNumbers.create({
 
 				phoneNumber: searchResults.availablePhoneNumbers[0].phoneNumber,
-				voiceUrl:'https://demo.twilio.com/welcome/voice',
-				smsUrl:'https://demo.twilio.com/welcome/sms/reply'
+				voiceUrl: "https://demo.twilio.com/welcome/voice",
+				smsUrl: "https://" + process.env.BASE_URL + "/webhook",
+				SmsMethod: "POST"
 
 			});
 
