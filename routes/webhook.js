@@ -19,14 +19,21 @@ router.post('/', function(req, res, next) {
 	//
 	client.messages(req.body.SmsMessageSid).get(function(err, message) {
 
-		//
-		//	Send to the front-end the new message
-		//
-    	process.bphone.emit('message', {
-    		origin: "webhook",
-            date: message.dateCreated,
-            body: message.body
-        });
+		if(err)
+		{
+			process.bphone.emit('alert', "Error: " + err.message);
+		}
+		else
+		{
+			//
+			//	Send to the front-end the new message
+			//
+	    	process.bphone.emit('message', {
+	    		origin: "webhook",
+	            date: message.dateCreated,
+	            body: message.body
+	        });
+		}
 
 		//
 		//	Highlight the number that sent us the new message.
