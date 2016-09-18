@@ -97,16 +97,45 @@ process.bphone.on('connection', function(socket) {
 		//
 		data.incomingPhoneNumbers.forEach(function(number) {
 
+			//
+			//	Make a variable to hold the capabilities in emoji format
+			//
+			let emoji = "";
+
+			//
+			//	Go over the list of capabilities and create a string with things
+			//	that are only available with that number.
+			//
+			for(let key in number.capabilities)
+			{
+				if(key == "voice" && number.capabilities)
+				{
+					emoji += "🗣";
+				}
+
+				if(key == "sms" && number.capabilities)
+				{
+					emoji += "📝"
+				}
+
+				if(key == "mms" && number.capabilities)
+				{
+					emoji += "🖼"
+				}
+			}
+
 			let obj = {
 
 				sid: number.sid,
-				nr: number.phoneNumber
+				nr: number.phoneNumber,
+				capabilities: emoji
 
 			}
 
 			socket.emit('number', obj);
 
-				let array = [];
+			let array = [];
+
 			//
 			//	Retrieve all the messages for a specific number
 			//

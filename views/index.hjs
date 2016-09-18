@@ -181,7 +181,7 @@
 		.append(
 			$('<li>')
 			.attr('id', msg.nr.slice(1)) // remove the + char.
-			.text(msg.nr) // Display the number
+			.text(msg.nr + " [" + msg.capabilities + "] ") // Display the number
 			.append(
 				$('<button>')
 				.text('delete')
