@@ -35,33 +35,45 @@
 				cursor: hand;
 			}
 
+			.inline
+			{
+				display: inline;
+			}
+
 		</style>
 
 	</head>
 
 	<body>
 
-		<p id="alert"></p>
-
-		<div>
-			<p>Buy a new number:</p>
-			<button id="buy">Buy</button>
-			<select id="countries"></select>
+		<div id="alert">
+			<p id="description" class="inline">Alert:</p>
+			<p id="notification" class="inline">If anything goes wrong, it will displayed hear.</p>
 		</div>
 
-		<p>Numbers:</p>
+		<div id="newNumber">
+			<p>Buy a new number:</p>
+			<select id="countries" class="inline"></select>
+			<button id="buy" class="inline">Buy</button>
+		</div>
 
-		<ul id="numbers"></ul>
+		<div id="numbers">
+			<p>Numbers:</p>
+			<ul></ul>
+		</div>
 
-		<p>Messages:</p>
+		<div id="messages" style="display: none;">
+			<p>Messages:</p>
+			<ul></ul>
+		</div>
 
-		<ul id="messages"></ul>
+		<div id="message" style="display: none;">
+			<input id="m" autocomplete="off" />
+			<input id="to" autocomplete="off" />
+			<input id="from" autocomplete="off" />
 
-		<input id="m" autocomplete="off" />
-		<input id="to" autocomplete="off" />
-		<input id="from" autocomplete="off" />
-
-		<button id="button" value="">Send</button>
+			<button id="button" value="">Send</button>
+		</div>
 
 	</body>
 
@@ -88,7 +100,7 @@
 	//
 	socket.on('alert', function(msg) {
 
-		$('#alert').text(msg);
+		$('#notification').text(msg);
 
 	});
 
@@ -102,7 +114,7 @@
 		//	Go over all the numbers and look for the one that got the new
 		//	message.
 		//
-		$("#numbers").children().each(function() {
+		$("#numbers > ul").children().each(function() {
 
 			//
 			//	Select one of our numbers that received the message.
@@ -163,7 +175,7 @@
 	//
 	socket.on('number', function(msg) {
 
-		$('#numbers')
+		$('#numbers > ul')
 		.append(
 			$('<li>')
 			.attr('id', msg.nr.slice(1)) // remove the + char.
@@ -219,12 +231,12 @@
 		//	Only update the messages view if it is active. Meaning someone
 		//	clicked on a number and the conversation is being displayed.
 		//
-		if($('#messages > li').length > 0 || msg.origin == 'click')
+		if($('#messages > ul > li').length > 0 || msg.origin == 'click')
 		{
 			//
 			//	Add the message on the page as it comes no mater the order/
 			//
-			$('#messages').append($('<li>').text(msg.date + ": " + msg.body));
+			$('#messages > ul').append($('<li>').text(msg.date + ": " + msg.body));
 
 			//
 			//	Push the message that we got a array, which will be used for
@@ -261,7 +273,7 @@
 			//	With this solution we can reorder the messages as they come. No
 			//	matter how the server sends them to us.
 			//
-			$('#messages > li').each(function(index) {
+			$('#messages > ul > li').each(function(index) {
 
 				var date = new Date(db[index].date);
 
@@ -296,7 +308,7 @@
 	//
 	socket.on('bought', function(msg) {
 
-		$('#numbers')
+		$('#numbers > ul')
 		.append(
 			$('<li>')
 			.text(msg.nr)
@@ -403,6 +415,12 @@
 			return;
 		}
 
+		//
+		//	Once we selected a number, we can display the message box
+		//
+		$("#message").show();
+		$("#messages").show();
+
 		$(this).removeClass("newMessage");
 		$(this).addClass("loading");
 
@@ -419,7 +437,7 @@
 
 		$('#to').val(to);
 		$('#from').val(from);
-		$('#messages').empty();
+		$('#messages > ul').empty();
 
 		var obj = {
 			to: to,
