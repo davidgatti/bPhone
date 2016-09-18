@@ -374,14 +374,21 @@
 	//
 	$('#numbers').on("click", '.delete', function() {
 
-		var nrElement = $(this);
-		var sid = $(this).attr('value');
+		//
+		//	Ask the user if it's sure about the deletion, since it might lose
+		//	all the messages.
+		//
+		if(confirm("Are you sure?!") == true)
+		{
+			var nrElement = $(this);
+			var sid = $(this).attr('value');
 
-		socket.emit('delete', sid, function() {
+			socket.emit('delete', sid, function() {
 
-			nrElement.parent().remove();
+				nrElement.parent().remove();
 
-		});
+			});
+		}
 
 	});
 
@@ -431,6 +438,10 @@
 	//
 	$("#buy").on("click", function() {
 
+		//
+		//	Before buying a phone ask the user if he or she are sure, since this
+		//	action costs money.
+		//
 		if(confirm("Do you want to buy a new number?!") == true)
 		{
 			//
