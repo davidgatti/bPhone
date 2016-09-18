@@ -19,6 +19,17 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 //
+//	Get the app name on Heroku so we can set the webhook URL for each number
+//	that a user buys.
+//
+app.use(function(req, res, next) {
+
+	console.log(req.headers.host);
+	next();
+
+});
+
+//
 //	Routes
 //
 app.use('/', require('./routes/index'));
