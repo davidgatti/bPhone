@@ -276,7 +276,7 @@
 								   pad(minute, 2) + ":" +
 								   pad(secconds, 2);
 
-				$(this).text(formatedDate + " :: " + db[index].body);
+				$(this).text(formatedDate + " ░ " + db[index].body);
 
 			});
 
