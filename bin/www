@@ -323,14 +323,16 @@ process.bphone.on('connection', function(socket) {
 		//
 		//  First, search for available phone numbers
 		//
-		client.availablePhoneNumbers(country).local.get().then(function(searchResults) {
+		client.availablePhoneNumbers(country).local
+			.get({SmsEnabled: true})
+			.then(function(searchResults) {
 
 			//
 			//  handle the case where there are no numbers found
 			//
-			if (searchResults.availablePhoneNumbers.length < 1)
+			if (searchResults.availablePhoneNumbers.length == 0)
 			{
-				socket.emit('alert', 'No numbers found with that area code');
+				throw new Error("No number found.")
 			}
 
 			//
@@ -363,7 +365,7 @@ process.bphone.on('connection', function(socket) {
 
 		}).fail(function(error) {
 
-			socket.emit('alert', 'Number purchase failed! Reason: ' + error.message);
+			socket.emit('alert', 'Purchase failed! Reason: ' + error.message);
 
 		});
 
