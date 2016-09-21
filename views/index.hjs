@@ -57,7 +57,11 @@
 			<button id="buy" class="inline">Buy</button>
 		</div>
 
-		<div id="numbers">
+		<div id="noNumbers">
+			<p>No number.</p>
+		</div>
+
+		<div id="numbers" style="display: none;">
 			<p>Numbers:</p>
 			<ul></ul>
 		</div>
@@ -176,6 +180,9 @@
 	//	Displaying all numbers in our account.
 	//
 	socket.on('number', function(msg) {
+
+		$("#noNumbers").remove();
+		$("#numbers").show();
 
 		$('#numbers > ul')
 		.append(
