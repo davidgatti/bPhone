@@ -62,7 +62,7 @@
 		</div>
 
 		<div id="numbers" style="display: none;">
-			<p>Numbers:</p>
+			<p>Numbers: <span id="numberCount">0</span></p>
 			<ul></ul>
 		</div>
 
@@ -181,9 +181,29 @@
 	//
 	socket.on('number', function(msg) {
 
+		//
+		//	Get the actual number of phone numbers
+		//
+		var numberCount = $("#numberCount").text();
+
+		//
+		//	At each event increment the count number by one.
+		//
+		$("#numberCount").text(parseInt(numberCount) + 1);
+
+		//
+		//	Remove the message saying no number
+		//
 		$("#noNumbers").remove();
+
+		//
+		//	Display the number section
+		//
 		$("#numbers").show();
 
+		//
+		//	Add the number to the UI
+		//
 		$('#numbers > ul')
 		.append(
 			$('<li>')
