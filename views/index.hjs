@@ -48,7 +48,7 @@
 
 		<div id="alert">
 			<p id="description" class="inline">Alert:</p>
-			<p id="notification" class="inline">If anything goes wrong, it will displayed hear.</p>
+			<p id="notification" class="inline">If anything goes wrong, it will displayed here.</p>
 		</div>
 
 		<div id="newNumber">
