@@ -1,6 +1,0 @@
-#!/bin/sh
-if [ "$NODE_ENV" = "local" ]; then
-  nodemon ./bin/www
-else
-  node ./bin/www
-fi
