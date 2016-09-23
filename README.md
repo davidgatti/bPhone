@@ -2,7 +2,7 @@
 
 Short for Browser Phone, bPhone is a project that is basically an interface to the Twilio API. I grew tired of expensive solutions with lots of features that I didn’t care about. I wanted something basic that just does one thing: Send and receive SMS. After being unable to find the right solution for the right price, I decided to write some code that is more of a working backend than an attractive UI.
 
-<div align="center">![Main Screen](https://github.com/davidgatti/bPhone/blob/assets/mainScreen.png)</div>
+<div align="center"><img src="https://github.com/davidgatti/bPhone/blob/assets/mainScreen.png"></div>
 
 I basically wanted something to help me register on old fashioned sites that require a phone to create an account.
 
