@@ -10,7 +10,8 @@
 			"description": "Find it in the dashboard https://www.twilio.com/console"
 		},
 		"AUTH_TOKEN": {
-			"description": "Find it in the dashboard https://www.twilio.com/console"
+			"description": "Find it in the dashboard https://www.twilio.com/console",
+			"value": "true"
 		}
 	}
 }
