@@ -22,7 +22,7 @@ Of course, you don’t have to host this code on Heroku; you can grab the projec
 
 <div align="center"><a href="https://heroku.com/deploy?template=https://github.com/davidgatti/bPhone" target="_blank"><img src="https://www.herokucdn.com/deploy/button.svg"></a></div>
 
-# Other
+# The End
 
 If you've enjoyed this article/project, please consider giving it a 🌟. Also check out my [GitHub account] (https://github.com/davidgatti), where I have other articles and apps that you might find interesting.
 
