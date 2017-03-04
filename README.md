@@ -20,11 +20,26 @@ To buy a phone number, you can just use the bPhone page; you’ll get a random n
 
 Of course, you don’t have to host this code on Heroku; you can grab the project and throw it on anything, but right now the Heroku Button is the easiest way to start.
 
-# Other Projects
-
-If bPhone sounds like something you'll enjoy, please consider giving it a 🌟. Also check out my [GitHub account](https://github.com/davidgatti), where I have other articles and apps that you might find interesting.
-
-All the best,
-David
-
 <div align="center"><a href="https://heroku.com/deploy?template=https://github.com/davidgatti/bPhone" target="_blank"><img src="https://www.herokucdn.com/deploy/button.svg"></a></div>
+
+# Other
+
+If you've enjoyed this article/project, please consider giving it a 🌟. Also check out my [GitHub account] (https://github.com/davidgatti), where I have other articles and apps that you might find interesting.
+
+## Where to follow
+
+You can follow me on social media 🐙😇, at the following locations:
+
+- [GitHub](https://github.com/davidgatti)
+- [Twitter](https://twitter.com/dawidgatti)
+- [Instagram](https://www.instagram.com/gattidavid/)
+
+## More about me
+
+I don’t only live on GitHub, I try to do many things not to get bored 🙃. To learn more about me, you can visit the following links:
+
+- [Podcasts](http://david.gatti.pl/podcasts)
+- [Articles](http://david.gatti.pl/articles)
+- [Technical Articles](http://david.gatti.pl/technical_articles)
+- [Software Projects](http://david.gatti.pl/software_projects)
+- [Hardware Projects](http://david.gatti.pl/hardware_projects)
